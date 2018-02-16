@@ -1,0 +1,62 @@
+service: redbee-challenge-backend
+
+provider:
+  name: aws
+  runtime: java8
+  environment:
+    DYNAMODB_USERS_TABLE: ${self:service}-user-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_USERS_TABLE}"
+
+package:
+  artifact: target/scala-2.12/redbee-challenge-backend.jar
+
+functions:
+  createUser:
+    handler: challenge.backend.user.handler.CreateUserHandler
+    events:
+      - http:
+          path: user
+          method: put
+          cors: true
+  updateUserInterests:
+    handler: challenge.backend.user.handler.UpdateUserInterests
+    events:
+      - http:
+          path: user/{userName}
+          method: patch
+          cors: true
+  getUserInterests:
+    handler: challenge.backend.user.handler.GetUserInterests
+    events:
+      - http:
+          path: user/{userName}
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_USERS_TABLE}
