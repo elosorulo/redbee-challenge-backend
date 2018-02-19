@@ -27,9 +27,11 @@ object ExecutionStatusResolver extends ExecutionTypes {
     }
   }
 
-  private def checkStatus(exception: BackendServiceException): ApiGatewayResponse= {
+  private def checkStatus(exception: BackendServiceException): ApiGatewayResponse = {
     val errorType: String = exception.errorCode match {
       //Invalid body
+      case 1006 => INVALID_INPUT_ERROR
+      //Serialization error
       case 1001 => INVALID_INPUT_ERROR
       //Invalid path Parameters
       case 1002 => INVALID_INPUT_ERROR

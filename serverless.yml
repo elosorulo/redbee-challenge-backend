@@ -50,11 +50,11 @@ resources:
       Properties:
         AttributeDefinitions:
           -
-            AttributeName: id
+            AttributeName: userName
             AttributeType: S
         KeySchema:
           -
-            AttributeName: id
+            AttributeName: userName
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
