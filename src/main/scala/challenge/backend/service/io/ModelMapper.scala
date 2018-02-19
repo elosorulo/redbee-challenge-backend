@@ -2,7 +2,6 @@ package challenge.backend.service.io
 
 import challenge.backend.api.{UserDto, UserInterestsDto}
 import challenge.backend.model.{User, UserInterests}
-import org.joda.time.DateTime
 
 object ModelMapper {
   def userDto(user: User): UserDto = {
@@ -21,7 +20,7 @@ object ModelMapper {
     User(userName =
       userDto.userName,
       email = userDto.email,
-      registrationDate = DateTime.now().getMillis,
+      registrationDate = 0,
       interests = userInterests(userDto.interests))
   }
 
