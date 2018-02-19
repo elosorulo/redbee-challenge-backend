@@ -21,21 +21,21 @@ package:
 
 functions:
   createUser:
-    handler: challenge.backend.user.handler.CreateUserHandler
+    handler: challenge.backend.handler.CreateUserHandler
     events:
       - http:
           path: user
-          method: put
+          method: post
           cors: true
   updateUserInterests:
-    handler: challenge.backend.user.handler.UpdateUserInterests
+    handler: challenge.backend.handler.UpdateUserInterestsHandler
     events:
       - http:
           path: user/{userName}
           method: patch
           cors: true
   getUserInterests:
-    handler: challenge.backend.user.handler.GetUserInterests
+    handler: challenge.backend.handler.GetUserInterestsHandler
     events:
       - http:
           path: user/{userName}

@@ -1,7 +1,9 @@
-package challenge.backend.utils
+package challenge.backend.service.io
 
-import challenge.backend.user.api.{CreateUserOperationResponse, InterestsOperationResponse, UserDto, UserInterestsDto}
-import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+import challenge.backend.api._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 
 object JsonUtils {
 
@@ -11,6 +13,10 @@ object JsonUtils {
 
   def interestsOperationResponseToJson(interestsOperationResponse: InterestsOperationResponse): String = {
     interestsOperationResponse.asJson.noSpaces
+  }
+
+  def errorResponseToJson(errorResponse: ErrorResponse): String = {
+    errorResponse.asJson.noSpaces
   }
 
   def userInterestsDtoToJson(userInterests: UserInterestsDto): String = {
@@ -28,8 +34,15 @@ object JsonUtils {
     }
   }
 
-  def jsonStringTointerestsOperationResponse(value: String): InterestsOperationResponse = {
+  def jsonStringToInterestsOperationResponse(value: String): InterestsOperationResponse = {
     decode[InterestsOperationResponse](value).toOption match {
+      case None => throw new Exception("Improve error message")
+      case Some(v) => v
+    }
+  }
+
+  def jsonStringToErrorResponse(value: String): ErrorResponse = {
+    decode[ErrorResponse](value).toOption match {
       case None => throw new Exception("Improve error message")
       case Some(v) => v
     }

@@ -1,17 +1,17 @@
-package challenge.backend.utils
+package challenge.backend.service.io
 
 import challenge.backend.api.aws.ApiGatewayResponse
-import challenge.backend.user.api.ExecutionStatus
+import challenge.backend.api.{ExecutionStatus, ExecutionTypes}
 
 import scala.collection.JavaConverters
 import scala.collection.JavaConverters._
 
-object IOMapper {
+object IOMapper extends ExecutionTypes {
 
   private final val PATH_PARAMETERS = "pathParameters"
   private final val BODY = "body"
 
-  def getPathParameters(request: java.util.Map[String, Object]): Map[String, String] = {
+  def pathParameters(request: java.util.Map[String, Object]): Map[String, String] = {
     request.asScala.get(PATH_PARAMETERS) match {
       case None => Map[String, String]()
       case Some(pp) =>
@@ -20,13 +20,17 @@ object IOMapper {
     }
   }
 
-  def getBody(request: java.util.Map[String, Object]): Option[String] = {
+  def body(request: java.util.Map[String, Object]): Option[String] = {
     request.asScala.get(BODY).map(v => v.toString)
   }
 
-  def getApiGatewayResponse(executionStatus: ExecutionStatus, body: String, headers: Map[String, String]): ApiGatewayResponse = {
+  def apiGatewayResponse(executionStatus: ExecutionStatus, body: String, headers: Map[String, String]): ApiGatewayResponse = {
     ApiGatewayResponse(statusCode = executionStatus.statusCode, body = body
       , headers = JavaConverters.mapAsJavaMap(headers.mapValues(v => v.asInstanceOf[Object]))
       , base64Encoded = false)
+  }
+
+  def successfulExecutionStatus(): ExecutionStatus = {
+    ExecutionStatus(200, SUCCEEDED, None)
   }
 }
