@@ -1,4 +1,4 @@
-package challenge.backend.service.io
+package challenge.backend.service.input
 
 import challenge.backend.api.{UserDto, UserInterestsDto}
 import challenge.backend.model.{User, UserInterests}

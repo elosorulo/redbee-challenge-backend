@@ -41,6 +41,21 @@ functions:
           path: user/{userName}
           method: get
           cors: true
+  getUsers:
+    handler: challenge.backend.handler.GetUsersHandler
+    events:
+      - http:
+          path: user
+          method: get
+          cors: true
+  getDashboard:
+    handler: challenge.backend.handler.GetDashboardHandler
+    events:
+      - http:
+          path: user/{userName}/dashboard/{page}
+          method: get
+          cors: true
+
 
 resources:
   Resources:

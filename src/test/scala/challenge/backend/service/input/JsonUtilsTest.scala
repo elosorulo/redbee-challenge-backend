@@ -1,7 +1,10 @@
-package challenge.backend.service.io
+package challenge.backend.service.input
 
 import challenge.backend.api.{ExecutionStatus, InterestsOperationResponse, UserDto, UserInterestsDto}
 import org.scalatest.{FunSuite, Matchers}
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 
 class JsonUtilsTest extends FunSuite with Matchers {
 
@@ -15,18 +18,10 @@ class JsonUtilsTest extends FunSuite with Matchers {
 
   private final val USER_DTO: UserDto = UserDto("jorge", "jorge@gmail.com", USER_INTERESTS_DTO)
 
-  test("InterestsOperationResponse Marshalling and Unmarshalling Test.") {
-    val responseJsonString: String = JsonUtils.interestsOperationResponseToJson(RESPONSE)
-    println(responseJsonString)
-    val stringToResponse: InterestsOperationResponse = JsonUtils.jsonStringToInterestsOperationResponse(responseJsonString)
-
-    RESPONSE shouldEqual stringToResponse
-  }
-
   test("UserDto marshalling and Unmarshalling Test.") {
-    val userDtoJsonString: String = JsonUtils.userDtoToJson(USER_DTO)
+    val userDtoJsonString: String = USER_DTO.asJson.noSpaces
     println(userDtoJsonString)
-    val stringToUserDto: UserDto = JsonUtils.jsonStringToUserDto(userDtoJsonString)
+    val stringToUserDto: UserDto = JsonUtils.handleDecoding(decode[UserDto](userDtoJsonString))
 
     USER_DTO shouldEqual stringToUserDto
   }

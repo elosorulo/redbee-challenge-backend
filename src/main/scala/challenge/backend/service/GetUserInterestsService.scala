@@ -6,8 +6,10 @@ import challenge.backend.api.aws.ApiGatewayResponse
 import challenge.backend.api.{BackendServiceException, ExecutionTypes, InterestsOperationResponse, UserInterestsDto}
 import challenge.backend.log.Logger
 import challenge.backend.model.{UserDao, UserInterests}
-import challenge.backend.service.io.{IOMapper, JsonUtils, ModelMapper}
+import challenge.backend.service.input.{IOMapper, ModelMapper}
 import com.amazonaws.services.lambda.runtime.Context
+import io.circe.generic.auto._
+import io.circe.syntax._
 
 class GetUserInterestsService @Inject() (userDao: UserDao) extends Service with ExecutionTypes {
   override def execute(input: util.Map[String, Object], context: Context): ApiGatewayResponse = {
@@ -20,7 +22,7 @@ class GetUserInterestsService @Inject() (userDao: UserDao) extends Service with 
         Logger.info(s"Serializing response to json.")
         val response: InterestsOperationResponse =
           InterestsOperationResponse(IOMapper.successfulExecutionStatus(), Some(responseUserInterestsDto))
-        val responseBody: String = JsonUtils.interestsOperationResponseToJson(response)
+        val responseBody: String = response.asJson.noSpaces
         Logger.info(s"Building ApiGatewayResponse.")
         IOMapper.apiGatewayResponse(
           executionStatus = IOMapper.successfulExecutionStatus(),

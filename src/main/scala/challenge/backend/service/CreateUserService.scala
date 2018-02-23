@@ -6,8 +6,12 @@ import challenge.backend.api._
 import challenge.backend.api.aws.ApiGatewayResponse
 import challenge.backend.log.Logger
 import challenge.backend.model.{User, UserDao}
-import challenge.backend.service.io.{IOMapper, JsonUtils, ModelMapper}
+import challenge.backend.service.input.{IOMapper, JsonUtils, ModelMapper}
 import com.amazonaws.services.lambda.runtime.Context
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
+
 
 class CreateUserService @Inject() (userDao: UserDao) extends Service {
   override def execute(input: util.Map[String, Object], context: Context): ApiGatewayResponse = {
@@ -16,7 +20,7 @@ class CreateUserService @Inject() (userDao: UserDao) extends Service {
       case None => throw BackendServiceException(1001, "The input body was empty.")
       case Some(b) =>
         Logger.info(s"Deserializing body to request UserDto: $b")
-        val requestUserDto: UserDto = JsonUtils.jsonStringToUserDto(b)
+        val requestUserDto: UserDto = JsonUtils.handleDecoding(decode[UserDto](b))
         Logger.info(s"Mapping request userDto to request user.")
         val requestUser: User = ModelMapper.user(requestUserDto)
         Logger.info("Executing UserDao put operation.")
@@ -26,7 +30,7 @@ class CreateUserService @Inject() (userDao: UserDao) extends Service {
         Logger.info(s"Serializing response to Json.")
         val response: CreateUserOperationResponse =
           CreateUserOperationResponse(IOMapper.successfulExecutionStatus(), Some(responseUserDto))
-        val responseBody: String = JsonUtils.createUserOperationResponseToJson(response)
+        val responseBody: String = response.asJson.noSpaces
         Logger.info(s"Building ApiGateWayResponse.")
         IOMapper.apiGatewayResponse(
           executionStatus = IOMapper.successfulExecutionStatus(),

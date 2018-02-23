@@ -1,9 +1,10 @@
 package challenge.backend.service.status
 
 import challenge.backend.api.aws.ApiGatewayResponse
-import challenge.backend.service.io.JsonUtils
 import challenge.backend.api.{BackendServiceException, ErrorResponse, ExecutionStatus, ExecutionTypes}
 import challenge.backend.log.Logger
+import io.circe.generic.auto._
+import io.circe.syntax._
 
 import scala.collection.JavaConverters
 
@@ -17,11 +18,11 @@ object ExecutionStatusResolver extends ExecutionTypes {
         Logger.error(e.getMessage)
         ApiGatewayResponse(
           statusCode = 503,
-          body = JsonUtils.errorResponseToJson(ErrorResponse(
+          body = ErrorResponse(
             executionStatus = ExecutionStatus(
               statusCode = 1000,
               message = Some("An unknown error has occured."),
-              executionType = UNKNOWN_ERROR))),
+              executionType = UNKNOWN_ERROR)).asJson.noSpaces,
           headers = JavaConverters.mapAsJavaMap[String, Object](Map.empty),
           base64Encoded = false)
     }
@@ -47,12 +48,10 @@ object ExecutionStatusResolver extends ExecutionTypes {
     }
     ApiGatewayResponse(
       statusCode = 503,
-      body = JsonUtils.errorResponseToJson(
-        ErrorResponse(ExecutionStatus(
+      body = ErrorResponse(ExecutionStatus(
           statusCode = exception.errorCode,
           message = Some(exception.message),
-          executionType = errorType))
-      ),
+          executionType = errorType)).asJson.noSpaces,
       headers = JavaConverters.mapAsJavaMap[String, Object](Map.empty),
       base64Encoded = false)
   }

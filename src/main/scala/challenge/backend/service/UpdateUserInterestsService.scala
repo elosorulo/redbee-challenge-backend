@@ -6,8 +6,11 @@ import challenge.backend.api.aws.ApiGatewayResponse
 import challenge.backend.api.{BackendServiceException, ExecutionTypes, InterestsOperationResponse, UserInterestsDto}
 import challenge.backend.log.Logger
 import challenge.backend.model.{UserDao, UserInterests}
-import challenge.backend.service.io.{IOMapper, JsonUtils, ModelMapper}
+import challenge.backend.service.input.{IOMapper, JsonUtils, ModelMapper}
 import com.amazonaws.services.lambda.runtime.Context
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 
 class UpdateUserInterestsService @Inject() (userDao: UserDao) extends Service with ExecutionTypes {
   override def execute(input: util.Map[String, Object], context: Context): ApiGatewayResponse = {
@@ -18,7 +21,7 @@ class UpdateUserInterestsService @Inject() (userDao: UserDao) extends Service wi
           case None => throw BackendServiceException(1002, "Invalid path parameters.")
           case Some(un) =>
             Logger.info(s"Deserializing body to request userInterestsDto: $b.")
-            val requestInterestsDto: UserInterestsDto = JsonUtils.jsonStringToUserInterestsDto(b)
+            val requestInterestsDto: UserInterestsDto = JsonUtils.handleDecoding(decode[UserInterestsDto](b))
             Logger.info(s"Mapping request userInterestsDto to request userInterests.")
             val requestInterests: UserInterests = ModelMapper.userInterests(requestInterestsDto)
             Logger.info(s"Executing updateOperation with request userInterests.")
@@ -28,7 +31,7 @@ class UpdateUserInterestsService @Inject() (userDao: UserDao) extends Service wi
             Logger.info(s"Serializing response to json.")
             val response: InterestsOperationResponse =
               InterestsOperationResponse(IOMapper.successfulExecutionStatus(), Some(responseUserInterestsDto))
-            val responseBody: String = JsonUtils.interestsOperationResponseToJson(response)
+            val responseBody: String = response.asJson.noSpaces
             Logger.info(s"Building ApiGatewayResponse.")
             IOMapper.apiGatewayResponse(
               executionStatus = IOMapper.successfulExecutionStatus(),

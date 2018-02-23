@@ -19,7 +19,7 @@ class UserDaoImpl @Inject() (dynamoBuilder: DynamoBuilder) extends UserDao {
     Logger.info(s"Initializing table.")
     val table: Table[User] = Table[User](scala.util.Properties.envOrNone(ENV_TABLE_NAME).get)
     val timestamp = DateTime.now().getMillis
-    Logger.info(s"Executing dynamoDB scan Operation")
+    Logger.info(s"Executing dynamoDB putOperation.")
     val persistedUser: User = user.copy(registrationDate = timestamp)
     Scanamo.exec(dynamoBuilder.build())(table.put(persistedUser))
     persistedUser
@@ -28,6 +28,7 @@ class UserDaoImpl @Inject() (dynamoBuilder: DynamoBuilder) extends UserDao {
   def updateIntersts(userName: String, userInterests: UserInterests): UserInterests = {
     Logger.info(s"Initializing table.")
     val table: Table[User] = Table[User](scala.util.Properties.envOrNone(ENV_TABLE_NAME).get)
+    Logger.info(s"Executing dynamoDB update Operation.")
     readUser(Scanamo.exec(dynamoBuilder.build())
     (table.update('userName -> userName, set('interests -> userInterests)))).interests
   }
@@ -46,5 +47,12 @@ class UserDaoImpl @Inject() (dynamoBuilder: DynamoBuilder) extends UserDao {
         Logger.error (x.toString)
         throw BackendServiceException(1004, "Unable to retrieve user from dynamodb.")
     }
+  }
+
+  override def getAll(): List[User] = {
+    Logger.info(s"Initializing table.")
+    val table: Table[User] = Table[User](scala.util.Properties.envOrNone(ENV_TABLE_NAME).get)
+    Logger.info(s"Executing dynamoDB scan Operation")
+    Scanamo.exec(dynamoBuilder.build())(table.scan()).map(o => readUser(o))
   }
 }
