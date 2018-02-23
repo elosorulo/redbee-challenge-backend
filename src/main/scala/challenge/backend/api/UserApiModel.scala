@@ -6,7 +6,7 @@ case class UserInterestsDto(profiles: List[String], hashTags: List[String])
 
 case class CreateUserOperationResponse(executionStatus: ExecutionStatus, user: Option[UserDto])
 
-case class GetUsersOperationResponse(executionStatus: ExecutionStatus, user: List[UserDto])
+case class GetUsersOperationResponse(executionStatus: ExecutionStatus, users: List[UserDto])
 
 case class InterestsOperationResponse(executionStatus: ExecutionStatus, userInterests: Option[UserInterestsDto])
 
