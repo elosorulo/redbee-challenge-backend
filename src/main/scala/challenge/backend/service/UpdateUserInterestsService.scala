@@ -36,7 +36,7 @@ class UpdateUserInterestsService @Inject() (userDao: UserDao) extends Service wi
             IOMapper.apiGatewayResponse(
               executionStatus = IOMapper.successfulExecutionStatus(),
               body = responseBody,
-              headers = Map.empty)
+              headers = Map("Access-Control-Allow-Origin" -> "*", "Access-Control-Allow-Credentials" -> "true"))
         }
     }
   }
